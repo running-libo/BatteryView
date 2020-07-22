@@ -26,19 +26,10 @@ public class BatteryView extends View {
     private Paint batteryPaint;
     /** 显示电量值 */
     private Paint textPain;
-    /** 低电量百分比 */
-    private final float lowPower = 0.1f;
-    /** 中电量百分比 */
-    private final float mediumPower = 0.4f;
-    /** 高电量百分比 */
-    private final float highPower = 0.8f;
-    private float curPower = lowPower;
+    private float powerLevel;
     private int width, height;
     /** 电池边框宽度 */
     private int strokeWidth = 12;
-    public static final int TYPE_LOW = 0;
-    public static final int TYPE_MEDIUM = 1;
-    public static final int TYPE_HIGH = 2;
 
 
     public BatteryView(Context context) {
@@ -60,6 +51,7 @@ public class BatteryView extends View {
         borderPaint.setStyle(Paint.Style.STROKE);
 
         batteryPaint = new Paint();
+        batteryPaint.setColor(getResources().getColor(R.color.red));
 
         textPain = new Paint();
         textPain.setColor(getResources().getColor(R.color.white));
@@ -78,20 +70,16 @@ public class BatteryView extends View {
      * 设置电量类型
      */
     public void setPowerLevel(int powerLevel) {
-        switch (powerLevel) {
-            case TYPE_LOW:
-                curPower = lowPower;
-                batteryPaint.setColor(getResources().getColor(R.color.red));
-                break;
-            case TYPE_MEDIUM:
-                curPower = mediumPower;
-                batteryPaint.setColor(getResources().getColor(R.color.yellow));
-                break;
-            case TYPE_HIGH:
-                curPower = highPower;
-                batteryPaint.setColor(getResources().getColor(R.color.green));
-                break;
+        if (powerLevel == 10) {  //低电量
+            batteryPaint.setColor(getResources().getColor(R.color.red));
+        } else if (powerLevel == 40) {  //中电量
+            batteryPaint.setColor(getResources().getColor(R.color.yellow));
+        } else if (powerLevel == 80) {  //高电量
+            batteryPaint.setColor(getResources().getColor(R.color.green));
         }
+
+        this.powerLevel = powerLevel;
+
         invalidate();
     }
 
@@ -126,13 +114,13 @@ public class BatteryView extends View {
     }
 
     private void drawPower(Canvas canvas) {
-        Rect rect = new Rect(strokeWidth, (int) (height*(1-curPower)), width-strokeWidth, height-strokeWidth);
+        Rect rect = new Rect(strokeWidth, (int) (height*(1-powerLevel/100*0.9)), width-strokeWidth, height-strokeWidth);
         canvas.drawRect(rect, batteryPaint);
     }
 
     private void drawPowerText(Canvas canvas) {
         Rect rect = new Rect();
-        String text = curPower*100 + "%";
+        String text = powerLevel + "%";
         textPain.getTextBounds(text, 0, text.length(), rect);
         canvas.drawText(text, (width-rect.width())/2, height/2, textPain);
     }

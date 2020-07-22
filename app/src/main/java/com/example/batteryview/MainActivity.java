@@ -8,14 +8,21 @@ import android.os.Message;
 
 public class MainActivity extends AppCompatActivity {
     private BatteryView batteryView;
+    /** 电量值，用0-100表示 */
     private int powerLevel;
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
-            batteryView.setPowerLevel(powerLevel%3);
-            powerLevel++;
-            handler.sendEmptyMessageDelayed(0, 1000);
+            if (powerLevel > 100) {
+                handler.removeMessages(0);
+            } else {
+                batteryView.setPowerLevel(powerLevel);
+                powerLevel++;
+
+                handler.sendEmptyMessageDelayed(0, 30);
+            }
+
         }
     };
 
@@ -26,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
         batteryView = findViewById(R.id.batteryview);
 
-        batteryView.setPowerLevel(BatteryView.TYPE_MEDIUM);
-        handler.sendEmptyMessageDelayed(0, 1000);
+        handler.sendEmptyMessageDelayed(0, 100);
     }
 }
